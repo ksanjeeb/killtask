@@ -85,30 +85,29 @@ function drawBulletFrame(pos, enemyChar, label) {
 }
 
 async function animateBullet() {
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     process.stdout.write(
       `\r  ${MARIO} ${gray("─".repeat(TRACK))} ${ENEMY}  ` +
       (i % 2 === 0 ? gray("aiming…") : yellow("🔫 FIRE!"))
     );
-    await sleep(180);
+    await sleep(80);
   }
   for (let pos = 0; pos < TRACK; pos++) {
     drawBulletFrame(pos, ENEMY, white("pew pew…"));
-    await sleep(36);
+    await sleep(18);
   }
 }
 
 async function animateExplosion() {
   const frames = [
-    [yellow("✸"), hitLabel("HIT")              ],
-    [red("✺"),    red("💥 BOOM!")               ],
-    [yellow("✦"), red("☠  TERMINATED")          ],
-    [white("·"),  green("✔  port killed")        ],
-    [" ",         green("✔  port killed")        ],
+    [yellow("✸"), hitLabel("HIT")         ],
+    [red("✺"),    red("💥 BOOM!")          ],
+    [yellow("✦"), red("☠  TERMINATED")    ],
+    [" ",         green("✔  port killed") ],
   ];
   for (const [sym, label] of frames) {
     process.stdout.write(`\r  ${MARIO} ${gray("·".repeat(TRACK))} ${sym}  ${label}`);
-    await sleep(85);
+    await sleep(60);
   }
   clearLine();
 }
@@ -122,7 +121,7 @@ async function animateBounce() {
       else              track += gray("─");
     }
     process.stdout.write(`\r  ${MARIO} ${track} ${red("⛨")}  ${red("blocked!")}`);
-    await sleep(22);
+    await sleep(12);
   }
   clearLine();
 }
