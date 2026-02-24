@@ -1,12 +1,20 @@
 {
   "name": "killtask",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Port killer CLI",
   "type": "module",
   "bin": {
     "killtask": "./index.js"
   },
-  "keywords": ["cli", "port", "kill", "kill-task", "task-kill", "process-kill", "process"],
+  "keywords": [
+    "cli",
+    "port",
+    "kill",
+    "kill-task",
+    "task-kill",
+    "process-kill",
+    "process"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
