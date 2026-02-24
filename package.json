@@ -1,0 +1,14 @@
+{
+    "name": "killport",
+    "version": "1.0.0",
+    "description": "Port killer CLI",
+    "type": "module",
+    "bin": {
+      "killport": "./index.js"
+    },
+    "dependencies": {
+      "chalk": "^5.3.0"
+    },
+    "keywords": ["cli", "port", "kill", "pacman"],
+    "license": "MIT"
+  }
