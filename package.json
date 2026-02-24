@@ -1,14 +1,19 @@
 {
-    "name": "killtask",
-    "version": "1.0.0",
-    "description": "Port killer CLI",
-    "type": "module",
-    "bin": {
-      "killtask": "./index.js"
-    },
-    "dependencies": {
-      "chalk": "^5.3.0"
-    },
-    "keywords": ["cli", "port", "kill", "kill-task","task-kill","process-kill","process"],
-    "license": "MIT"
+  "name": "killtask",
+  "version": "1.1.0",
+  "description": "Port killer CLI",
+  "type": "module",
+  "bin": {
+    "killtask": "./index.js"
+  },
+  "keywords": ["cli", "port", "kill", "kill-task", "task-kill", "process-kill", "process"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ksanjeeb/killport.git"
+  },
+  "homepage": "https://github.com/ksanjeeb/killport#readme",
+  "bugs": {
+    "url": "https://github.com/ksanjeeb/killport/issues"
   }
+}

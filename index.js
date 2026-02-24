@@ -2,10 +2,36 @@
 
 import { exec } from "child_process";
 import os from "os";
-import chalk from "chalk";
 import readline from "readline";
 
-// ─── Args ────────────────────────────────────────────────────────────────────
+// ─── ANSI ─────────────────────────────────────────────────────────────────────
+const c = {
+  reset:    "\x1b[0m",
+  bold:     "\x1b[1m",
+  gray:     "\x1b[90m",
+  red:      "\x1b[31m",
+  green:    "\x1b[32m",
+  yellow:   "\x1b[33m",
+  cyan:     "\x1b[36m",
+  white:    "\x1b[97m",
+  magenta:  "\x1b[35m",
+  bgRed:    "\x1b[41m",
+};
+
+const clr  = (code, str) => `${code}${str}${c.reset}`;
+const gray    = s => clr(c.gray, s);
+const red     = s => clr(c.red, s);
+const green   = s => clr(c.green, s);
+const yellow  = s => clr(c.yellow, s);
+const cyan    = s => clr(c.cyan, s);
+const white   = s => clr(c.white, s);
+const magenta = s => clr(c.magenta, s);
+const bold    = s => clr(c.bold, s);
+const boldCyan    = s => `${c.bold}${c.cyan}${s}${c.reset}`;
+const boldMagenta = s => `${c.bold}${c.magenta}${s}${c.reset}`;
+const hitLabel    = s => `${c.bgRed}${c.bold} ${s} ${c.reset}`;
+
+// ─── Args ─────────────────────────────────────────────────────────────────────
 const args      = process.argv.slice(2);
 const FLAGS     = new Set(["--soft","--no-force","--all","--yes","-y","--verbose","-v","--help","-h"]);
 const isForce   = !args.includes("--soft") && !args.includes("--no-force");
@@ -15,7 +41,7 @@ const isVerbose = args.includes("--verbose") || args.includes("-v");
 const ports     = args.filter(a => !FLAGS.has(a) && !a.startsWith("-"));
 const isWin     = os.platform() === "win32";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 function run(cmd) {
@@ -28,14 +54,14 @@ function run(cmd) {
 }
 
 function log(...msg) {
-  if (isVerbose) console.log(chalk.gray("    ·"), ...msg);
+  if (isVerbose) console.log(gray("    ·"), ...msg);
 }
 
 function confirm(q) {
   if (isYes) return Promise.resolve(true);
   return new Promise(resolve => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    rl.question(chalk.yellow(`  ⚠️  ${q} [y/N] `), a => { rl.close(); resolve(a.toLowerCase() === "y"); });
+    rl.question(yellow(`  ⚠️  ${q} [y/N] `), a => { rl.close(); resolve(a.toLowerCase() === "y"); });
   });
 }
 
@@ -43,53 +69,45 @@ function clearLine() {
   process.stdout.write("\r" + " ".repeat(72) + "\r");
 }
 
-// ─── Animation ───────────────────────────────────────────────────────────────
-// Runs CONCURRENTLY with the kill — bullet travels while kill executes,
-// explosion plays after kill resolves.
-
+// ─── Animation ────────────────────────────────────────────────────────────────
 const TRACK = 24;
-const MARIO = chalk.red("♜");
-const ENEMY = chalk.green("♟");
+const MARIO = red("♜");
+const ENEMY = `\x1b[32m♟${c.reset}`;
 
-function drawFrame(bulletPos, enemyChar, label) {
+function drawBulletFrame(pos, enemyChar, label) {
   let track = "";
   for (let i = 0; i < TRACK; i++) {
-    if (i === bulletPos)        track += chalk.yellowBright("►");
-    else if (i < bulletPos)     track += chalk.gray("·");
-    else                        track += chalk.gray("─");
+    if (i === pos)       track += yellow("►");
+    else if (i < pos)    track += gray("·");
+    else                 track += gray("─");
   }
   process.stdout.write(`\r  ${MARIO} ${track} ${enemyChar}  ${label}`);
 }
 
-// Animate bullet travelling — returns a promise that resolves when bullet reaches end
 async function animateBullet() {
-  // Aim flash
   for (let i = 0; i < 3; i++) {
     process.stdout.write(
-      `\r  ${MARIO} ${chalk.gray("─".repeat(TRACK))} ${ENEMY}  ` +
-      (i % 2 === 0 ? chalk.gray("aiming…") : chalk.yellowBright("🔫 FIRE!"))
+      `\r  ${MARIO} ${gray("─".repeat(TRACK))} ${ENEMY}  ` +
+      (i % 2 === 0 ? gray("aiming…") : yellow("🔫 FIRE!"))
     );
     await sleep(180);
   }
-  // Bullet travels
   for (let pos = 0; pos < TRACK; pos++) {
-    drawFrame(pos, ENEMY, chalk.white("pew pew…"));
+    drawBulletFrame(pos, ENEMY, white("pew pew…"));
     await sleep(36);
   }
 }
 
 async function animateExplosion() {
   const frames = [
-    [chalk.yellowBright("✸"), chalk.bgRed.bold(" HIT ")     ],
-    [chalk.red("✺"),           chalk.red("💥 BOOM!")        ],
-    [chalk.yellowBright("✦"), chalk.red("☠  TERMINATED")   ],
-    [chalk.white("·"),         chalk.green("✔  port killed") ],
-    [" ",                      chalk.green("✔  port killed") ],
+    [yellow("✸"), hitLabel("HIT")              ],
+    [red("✺"),    red("💥 BOOM!")               ],
+    [yellow("✦"), red("☠  TERMINATED")          ],
+    [white("·"),  green("✔  port killed")        ],
+    [" ",         green("✔  port killed")        ],
   ];
   for (const [sym, label] of frames) {
-    process.stdout.write(
-      `\r  ${MARIO} ${chalk.gray("·".repeat(TRACK))} ${sym}  ${label}`
-    );
+    process.stdout.write(`\r  ${MARIO} ${gray("·".repeat(TRACK))} ${sym}  ${label}`);
     await sleep(85);
   }
   clearLine();
@@ -99,33 +117,22 @@ async function animateBounce() {
   for (let pos = TRACK - 1; pos >= 0; pos--) {
     let track = "";
     for (let i = 0; i < TRACK; i++) {
-      if (i === pos)      track += chalk.red("◄");
-      else if (i > pos)   track += chalk.gray("·");
-      else                track += chalk.gray("─");
+      if (i === pos)    track += red("◄");
+      else if (i > pos) track += gray("·");
+      else              track += gray("─");
     }
-    process.stdout.write(
-      `\r  ${MARIO} ${track} ${chalk.red("⛨")}  ${chalk.red("blocked!")}`
-    );
+    process.stdout.write(`\r  ${MARIO} ${track} ${red("⛨")}  ${red("blocked!")}`);
     await sleep(22);
   }
   clearLine();
 }
 
-// ─── Kill + animate concurrently ─────────────────────────────────────────────
 async function killWithAnimation(pid) {
-  // Start bullet animation and kill in parallel
   const killPromise = killPid(pid);
   await animateBullet();
-
-  // Wait for kill to finish (it's usually done by now)
   const ok = await killPromise;
-
-  if (ok) {
-    await animateExplosion();
-  } else {
-    await animateBounce();
-  }
-
+  if (ok) await animateExplosion();
+  else    await animateBounce();
   return ok;
 }
 
@@ -150,7 +157,7 @@ async function getAppLabel(pid) {
     }
     return buildLabel(name, cmdLine);
   } catch {
-    return chalk.gray("unknown");
+    return gray("unknown");
   }
 }
 
@@ -161,11 +168,11 @@ function buildLabel(name, cmdLine) {
   const entry  = tokens.slice(1).find(t => !t.startsWith("-")) ?? "";
   const short  = entry.split(/[/\\]/).pop();
   if (RUNTIMES.has(bin) && short)
-    return `${chalk.white(bin)} ${chalk.gray("·")} ${chalk.cyan(short)}`;
-  return chalk.white(bin || "unknown");
+    return `${white(bin)} ${gray("·")} ${cyan(short)}`;
+  return white(bin || "unknown");
 }
 
-// ─── Process Discovery ───────────────────────────────────────────────────────
+// ─── Process Discovery ────────────────────────────────────────────────────────
 async function getPidsForPort(port) {
   const pids = new Map();
   if (isWin) {
@@ -227,7 +234,7 @@ async function killPid(pid) {
       log(`PID ${pid} terminated`);
       return true;
     } catch (e) {
-      log(chalk.red(e.message.split("\n").find(l => l.trim()) ?? e.message));
+      log(red(e.message.split("\n").find(l => l.trim()) ?? e.message));
       return false;
     }
   } else {
@@ -250,30 +257,27 @@ let nKilled = 0, nFailed = 0, nNotFound = 0;
 // ─── killPort ─────────────────────────────────────────────────────────────────
 async function killPort(port) {
   if (!/^\d+$/.test(port) || +port < 1 || +port > 65535) {
-    console.log(chalk.red(`  ✗  Invalid port: ${port}`)); return;
+    console.log(red(`  ✗  Invalid port: ${port}`)); return;
   }
 
   const pids = await getPidsForPort(port);
 
   if (pids.size === 0) {
-    console.log(`  ${chalk.gray("○")}  :${chalk.white(port)}  ${chalk.gray("— nothing listening")}`);
+    console.log(`  ${gray("○")}  :${white(port)}  ${gray("— nothing listening")}`);
     nNotFound++; return;
   }
 
   for (const entry of pids.values()) {
-    // Single info line
     console.log(
-      `\n  ${chalk.cyan("▸")}  :${chalk.bold.cyan(port)}  ` +
-      `${chalk.gray(`PID ${entry.pid}`)}  ${entry.appLabel}\n`
+      `\n  ${cyan("▸")}  :${boldCyan(port)}  ` +
+      `${gray(`PID ${entry.pid}`)}  ${entry.appLabel}\n`
     );
-
     const ok = await killWithAnimation(entry.pid);
-
     if (ok) {
-      console.log(`  ${chalk.red("☠")}  :${chalk.bold.magenta(port)} killed  ${chalk.gray("←")} ${entry.appLabel}`);
+      console.log(`  ${red("☠")}  :${boldMagenta(port)} killed  ${gray("←")} ${entry.appLabel}`);
       nKilled++;
     } else {
-      console.log(`  ${chalk.red("✗")}  :${chalk.bold(port)} could not be killed — try ${chalk.yellow("--soft")}`);
+      console.log(`  ${red("✗")}  :${bold(port)} could not be killed — try ${yellow("--soft")}`);
       nFailed++;
     }
     console.log();
@@ -284,28 +288,28 @@ async function killPort(port) {
 async function killAll() {
   const pids = await getAllListeningPids();
   if (pids.size === 0) {
-    console.log(chalk.gray("  ○  No listening processes found.")); return;
+    console.log(gray("  ○  No listening processes found.")); return;
   }
 
-  console.log(chalk.cyan(`\n  ${pids.size} process(es) listening:\n`));
+  console.log(cyan(`\n  ${pids.size} process(es) listening:\n`));
   for (const { pid, appLabel, port } of pids.values())
-    console.log(`    ${chalk.gray(`:${String(port).padEnd(6)}`)} ${chalk.gray(`PID ${String(pid).padStart(6)}`)}  ${appLabel}`);
+    console.log(`    ${gray(`:${String(port).padEnd(6)}`)} ${gray(`PID ${String(pid).padStart(6)}`)}  ${appLabel}`);
   console.log();
 
   const ok = await confirm(`Terminate ALL ${pids.size} processes?`);
-  if (!ok) { console.log(chalk.gray("\n  Aborted.\n")); return; }
+  if (!ok) { console.log(gray("\n  Aborted.\n")); return; }
 
   for (const entry of pids.values()) {
     console.log(
-      `\n  ${chalk.cyan("▸")}  :${chalk.bold.cyan(entry.port)}  ` +
-      `${chalk.gray(`PID ${entry.pid}`)}  ${entry.appLabel}\n`
+      `\n  ${cyan("▸")}  :${boldCyan(entry.port)}  ` +
+      `${gray(`PID ${entry.pid}`)}  ${entry.appLabel}\n`
     );
     const killed = await killWithAnimation(entry.pid);
     if (killed) {
-      console.log(`  ${chalk.red("☠")}  :${chalk.bold.magenta(entry.port)} killed  ${chalk.gray("←")} ${entry.appLabel}`);
+      console.log(`  ${red("☠")}  :${boldMagenta(entry.port)} killed  ${gray("←")} ${entry.appLabel}`);
       nKilled++;
     } else {
-      console.log(`  ${chalk.red("✗")}  :${chalk.bold(entry.port)} could not be killed`);
+      console.log(`  ${red("✗")}  :${bold(entry.port)} could not be killed`);
       nFailed++;
     }
     console.log();
@@ -315,20 +319,20 @@ async function killAll() {
 // ─── Help ─────────────────────────────────────────────────────────────────────
 function showHelp() {
   console.log(`
-  ${chalk.red("♜")} ${chalk.bold("killport")}
+  ${red("♜")} ${bold("killport")}
 
-  ${chalk.cyan("Usage:")}
+  ${cyan("Usage:")}
     killport <port> [port ...]
     killport --all
 
-  ${chalk.cyan("Options:")}
+  ${cyan("Options:")}
     --soft, --no-force   Graceful SIGTERM before SIGKILL
     --all                Kill every listening process
     --yes, -y            Skip --all confirmation
     --verbose, -v        Show signal details
     --help, -h           This help
 
-  ${chalk.cyan("Examples:")}
+  ${cyan("Examples:")}
     killport 3000
     killport 3000 8080
     killport --all -y
@@ -340,15 +344,15 @@ async function main() {
   if (args.includes("--help") || args.includes("-h")) { showHelp(); process.exit(0); }
 
   if (!isAll && ports.length === 0) {
-    console.error(chalk.red("\n  ❌  Provide at least one port, or use --all\n"));
+    console.error(red("\n  ❌  Provide at least one port, or use --all\n"));
     showHelp(); process.exit(1);
   }
 
   const target = isAll
-    ? chalk.red("all processes")
-    : ports.map(p => chalk.cyan(`:${p}`)).join(chalk.gray("  "));
+    ? red("all processes")
+    : ports.map(p => cyan(`:${p}`)).join(gray("  "));
 
-  console.log(`\n  ${chalk.red("♜")} ${chalk.bold("killport")}  ${chalk.gray("·")}  ${target}\n`);
+  console.log(`\n  ${red("♜")} ${bold("killport")}  ${gray("·")}  ${target}\n`);
 
   try {
     if (isAll) {
@@ -358,15 +362,15 @@ async function main() {
     }
 
     const parts = [];
-    if (nKilled)   parts.push(chalk.green(`☠  ${nKilled} killed`));
-    if (nFailed)   parts.push(chalk.red(`✗  ${nFailed} failed`));
-    if (nNotFound) parts.push(chalk.gray(`○  ${nNotFound} not found`));
-    if (parts.length) console.log("  " + parts.join(chalk.gray("   ·   ")));
+    if (nKilled)   parts.push(green(`☠  ${nKilled} killed`));
+    if (nFailed)   parts.push(red(`✗  ${nFailed} failed`));
+    if (nNotFound) parts.push(gray(`○  ${nNotFound} not found`));
+    if (parts.length) console.log("  " + parts.join(gray("   ·   ")));
     console.log();
 
   } catch (err) {
     clearLine();
-    console.error(chalk.red("  ❌"), err.message);
+    console.error(red("  ❌"), err.message);
     process.exit(1);
   }
 }

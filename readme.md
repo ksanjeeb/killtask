@@ -1,9 +1,9 @@
-# killport
+# killtask
 CLI to kill ports.
 
 ## Usage
 
-killport 8080
-killport 8080 3000
-killport --all
-killport 8080 --force
+npx killtask 8080
+npx killtask 8080 3000
+npx killtask --all
+npx killtask 8080 --force
