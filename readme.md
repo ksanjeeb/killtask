@@ -1,4 +1,4 @@
-<img width="615" height="137" alt="image" src="https://github.com/user-attachments/assets/f54de43b-f9a3-4ab8-86e7-ee50e6bc59f6" />
+<img width="2080" height="732" alt="image" src="https://github.com/user-attachments/assets/625385e1-14be-4795-88a2-28811edb2346" />
 
 
 # killtask
@@ -31,4 +31,5 @@ npx killtask --all
 * `--all` – Kill all listening ports
 * `--help` – Show help
 * `--version` – Show version
+
 
