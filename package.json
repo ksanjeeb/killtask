@@ -1,6 +1,6 @@
 {
   "name": "killtask",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Port killer CLI",
   "type": "module",
   "bin": {
