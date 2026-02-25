@@ -4,7 +4,7 @@
   "description": "Port killer CLI",
   "type": "module",
   "bin": {
-    "killtask": "./index.js"
+    "killtask": "./index.min.js"
   },
   "keywords": [
     "cli",
@@ -18,10 +18,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ksanjeeb/killport.git"
+    "url": "https://github.com/ksanjeeb/killtask.git"
   },
-  "homepage": "https://github.com/ksanjeeb/killport#readme",
+  "homepage": "https://github.com/ksanjeeb/killtask#readme",
   "bugs": {
-    "url": "https://github.com/ksanjeeb/killport/issues"
+    "url": "https://github.com/ksanjeeb/killtask/issues"
   }
 }
