@@ -1,5 +1,4 @@
-<img width="2080" height="732" alt="image" src="https://github.com/user-attachments/assets/1fde7b1a-eb3b-4315-9de2-4606331d37ab" />
-
+<img width="2080" height="732" alt="image" src="https://github.com/user-attachments/assets/6009fb02-98dc-402a-8cb2-26067734385d" />
 # killtask
 
 CLI to kill processes running on specific ports.
@@ -30,6 +29,7 @@ npx killtask --all
 * `--all` – Kill all listening ports
 * `--help` – Show help
 * `--version` – Show version
+
 
 
 
