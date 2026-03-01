@@ -1,24 +1,21 @@
 {
   "name": "killtask",
-  "version": "1.1.7",
+  "version": "2.0.0",
   "description": "Port killer CLI",
   "type": "module",
   "bin": {
-    "killtask": "./index.min.js"
+    "killtask": "index.min.js"
   },
   "keywords": [
     "cli",
     "port",
     "kill",
-    "kill-task",
-    "task-kill",
-    "process-kill",
     "process"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ksanjeeb/killtask.git"
+    "url": "git+https://github.com/ksanjeeb/killtask.git"
   },
   "homepage": "https://github.com/ksanjeeb/killtask#readme",
   "bugs": {
